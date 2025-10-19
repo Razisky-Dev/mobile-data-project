@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}RazilHub - Mobile Data & Services{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <!-- Navigation Styles -->
+    <style>
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 60px;
+        }
+        
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: nowrap;
+        }
+        
+        .brand-link {
+            color: white;
+            text-decoration: none;
+            font-size: 1.5em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .brand-link:hover {
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .profile-dropdown {
+            position: relative;
+        }
+        
+        .profile-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+        
+        .profile-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-1px);
+        }
+        
+        .dropdown-arrow {
+            font-size: 0.7em;
+            transition: transform 0.3s ease;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            min-width: 180px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+        
+        .dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            color: #333;
+            text-decoration: none;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s ease;
+        }
+        
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .dropdown-item:hover {
+            background: #f8f9fa;
+            color: #667eea;
+        }
+        
+        .dropdown-icon {
+            font-size: 1.1em;
+        }
+        
+        /* Notification Dropdown */
+        .notification-dropdown {
+            position: relative;
+            margin-right: 10px;
+        }
+        
+        .notification-btn {
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            color: #fff;
+            text-decoration: none;
+            border: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            height: 40px;
+            cursor: pointer;
+        }
+        
+        .notification-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .notification-icon {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+        
+        .notification-count {
+            background: #ff4757;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.7em;
+            font-weight: bold;
+            min-width: 18px;
+            text-align: center;
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            animation: pulse 2s infinite;
+        }
+        
+        .notification-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            min-width: 350px;
+            max-width: 400px;
+            max-height: 500px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1001;
+            overflow: hidden;
+        }
+        
+        .notification-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .notification-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+        }
+        
+        .notification-header h3 {
+            margin: 0;
+            font-size: 1.1em;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .mark-all-read {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        
+        .mark-all-read:hover {
+            background: #5a6fd8;
+        }
+        
+        .notification-list {
+            max-height: 350px;
+            overflow-y: auto;
+        }
+        
+        .notification-item {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s ease;
+        }
+        
+        .notification-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .notification-item.unread {
+            background: #f0f8ff;
+            border-left: 3px solid #667eea;
+        }
+        
+        .notification-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+            font-size: 0.9em;
+        }
+        
+        .notification-message {
+            color: #666;
+            font-size: 0.85em;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+        
+        .notification-time {
+            color: #999;
+            font-size: 0.75em;
+        }
+        
+        .notification-loading {
+            padding: 20px;
+            text-align: center;
+            color: #999;
+            font-size: 0.9em;
+        }
+        
+        .notification-footer {
+            padding: 12px 20px;
+            border-top: 1px solid #f0f0f0;
+            text-align: center;
+            background: #f8f9fa;
+        }
+        
+        .notification-footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+        
+        .notification-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Page Loading Indicator */
+        #pageLoader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-loader-overlay {
+            text-align: center;
+        }
+
+        .page-loader-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .page-loader-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .page-loader-content p {
+            margin: 0;
+            color: #4a5568;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 0 15px;
+            }
+            
+            .brand-link {
+                font-size: 1.3em;
+            }
+            
+            .profile-text {
+                display: none;
+            }
+            
+            .profile-btn {
+                padding: 8px 12px;
+            }
+        }
+    </style>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📱</text></svg>">
+    <meta name="description" content="RazilHub - Your one-stop platform for mobile data bundles, car wash services, delivery, and food ordering in Ghana">
+    <meta name="keywords" content="mobile data, Ghana, MTN, Telecel, AirtelTigo, data bundles, car wash, delivery, food">
+    <meta name="author" content="RazilHub">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="{% block og_title %}RazilHub - Mobile Data & Services{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Your one-stop platform for mobile data bundles and services in Ghana{% endblock %}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.url }}">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}RazilHub - Mobile Data & Services{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}Your one-stop platform for mobile data bundles and services in Ghana{% endblock %}">
+    
+    <!-- Additional Meta Tags for SEO -->
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#667eea">
+    <meta name="msapplication-TileColor" content="#667eea">
+    
+    <!-- Preconnect to external domains for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "RazilHub",
+        "description": "Mobile data bundles and services platform for Ghana",
+        "url": "{{ request.url_root }}",
+        "logo": "{{ url_for('static', filename='logo.png', _external=True) }}",
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+233-XXX-XXXX",
+            "contactType": "customer service"
+        },
+        "address": {
+            "@type": "PostalAddress",
+            "addressCountry": "GH"
+        }
+    }
+    </script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="{{ url_for('dashboard') }}" class="brand-link">
+                    📱 RazilHub
+                </a>
+            </div>
+            
+            {% if session.user_id %}
+            <div class="nav-menu">
+                <div class="notification-dropdown">
+                    <button class="notification-btn" onclick="toggleNotificationDropdown()" title="Notifications">
+                        <span class="notification-icon">🔔</span>
+                        <span class="notification-count" id="notificationCount">0</span>
+                    </button>
+                    <div class="notification-menu" id="notificationDropdown">
+                        <div class="notification-header">
+                            <h3>Notifications</h3>
+                            <button class="mark-all-read" onclick="markAllAsRead()">Mark all read</button>
+                        </div>
+                        <div class="notification-list" id="notificationList">
+                            <div class="notification-loading">Loading notifications...</div>
+                        </div>
+                        <div class="notification-footer">
+                            <a href="#" onclick="showAllNotifications()">View all notifications</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-dropdown">
+                    <button class="profile-btn" onclick="toggleDropdown()">
+                        <span class="profile-icon">👤</span>
+                        <span class="profile-text">Profile</span>
+                        <span class="dropdown-arrow">▼</span>
+                    </button>
+                    <div class="dropdown-menu" id="profileDropdown">
+                        <a href="{{ url_for('profile') }}" class="dropdown-item">
+                            <span class="dropdown-icon">👤</span>
+                            My Profile
+                        </a>
+                        <a href="{{ url_for('logout') }}" class="dropdown-item">
+                            <span class="dropdown-icon">🚪</span>
+                            Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </nav>
+    
+    {% block content %}{% endblock %}
+    
+    <!-- Footer -->
+    <footer style="text-align: center; padding: 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9em;">
+        <div class="container">
+            <p>&copy; 2024 RazilHub. All rights reserved. | 
+               <a href="#" style="color: rgba(255, 255, 255, 0.8); text-decoration: none;">Privacy Policy</a> | 
+               <a href="#" style="color: rgba(255, 255, 255, 0.8); text-decoration: none;">Terms of Service</a> | 
+               <a href="#" style="color: rgba(255, 255, 255, 0.8); text-decoration: none;">Contact Us</a>
+            </p>
+            <p style="margin-top: 10px; font-size: 0.8em;">
+                📱 Mobile Data • 🚗 Car Wash • 📦 Delivery • 🍕 Food Ordering (Coming Soon)
+            </p>
+        </div>
+    </footer>
+    
+    <!-- JavaScript for enhanced user experience -->
+    <script>
+        // Profile dropdown functionality
+        function toggleDropdown() {
+            const dropdown = document.getElementById('profileDropdown');
+            const arrow = document.querySelector('.dropdown-arrow');
+            
+            if (dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+                if (arrow) arrow.style.transform = 'rotate(0deg)';
+            } else {
+                dropdown.classList.add('show');
+                if (arrow) arrow.style.transform = 'rotate(180deg)';
+            }
+        }
+        
+        // Initialize page functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle form submissions with loading states
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.addEventListener('submit', function() {
+                    const button = this.querySelector('button[type="submit"]');
+                    if (button) {
+                        button.classList.add('loading');
+                        button.disabled = true;
+                        button.innerHTML = '⏳ Processing...';
+                    }
+                });
+            });
+            
+            // Add smooth scrolling for anchor links
+            const links = document.querySelectorAll('a[href^="#"]');
+            links.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+            
+            // Add fade-in animation to elements
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+            
+            const animatedElements = document.querySelectorAll('.service-card, .service-item, .stat-card');
+            animatedElements.forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(el);
+            });
+        });
+        
+        // Phone number validation
+        function validatePhoneNumber(input) {
+            const phoneRegex = /^0[0-9]{9}$/;
+            const isValid = phoneRegex.test(input.value);
+            
+            if (!isValid && input.value.length > 0) {
+                input.setCustomValidity('Please enter a valid Ghana phone number (e.g., 0241234567)');
+            } else {
+                input.setCustomValidity('');
+            }
+        }
+        
+        // Add phone validation to all phone inputs
+        document.addEventListener('DOMContentLoaded', function() {
+            const phoneInputs = document.querySelectorAll('input[type="tel"]');
+            phoneInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    validatePhoneNumber(this);
+                });
+            });
+
+            // Page loading indicator - only for form submissions
+            const allForms = document.querySelectorAll('form');
+            allForms.forEach(form => {
+                form.addEventListener('submit', function() {
+                    showPageLoader();
+                });
+            });
+        });
+
+        // Global loading functions
+        function showPageLoader() {
+            let loader = document.getElementById('pageLoader');
+            if (!loader) {
+                loader = document.createElement('div');
+                loader.id = 'pageLoader';
+                loader.innerHTML = `
+                    <div class="page-loader-overlay">
+                        <div class="page-loader-content">
+                            <div class="page-loader-spinner"></div>
+                            <p>Loading...</p>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(loader);
+            }
+            loader.style.display = 'flex';
+        }
+
+        function hidePageLoader() {
+            const loader = document.getElementById('pageLoader');
+            if (loader) {
+                loader.style.display = 'none';
+            }
+        }
+
+        // Add loading to all links (only for form submissions, not navigation)
+        document.addEventListener('click', function(e) {
+            if (e.target.tagName === 'A' && !e.target.href.includes('#') && !e.target.classList.contains('no-loader') && e.target.closest('form')) {
+                showPageLoader();
+            }
+        });
+
+        // Load notification count and setup dropdown
+        document.addEventListener('DOMContentLoaded', function() {
+            loadNotificationCount();
+            loadNotifications();
+        });
+
+        function loadNotificationCount() {
+            fetch('/api/notifications/count')
+                .then(response => response.json())
+                .then(data => {
+                    const countElement = document.getElementById('notificationCount');
+                    if (countElement) {
+                        countElement.textContent = data.count || 0;
+                        if (data.count > 0) {
+                            countElement.style.display = 'block';
+                        } else {
+                            countElement.style.display = 'none';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.log('Could not load notification count');
+                });
+        }
+
+        function loadNotifications() {
+            fetch('/api/notifications/recent')
+                .then(response => response.json())
+                .then(data => {
+                    const notificationList = document.getElementById('notificationList');
+                    if (notificationList && data.notifications) {
+                        if (data.notifications.length === 0) {
+                            notificationList.innerHTML = '<div class="notification-loading">No notifications yet</div>';
+                        } else {
+                            notificationList.innerHTML = data.notifications.map(notification => `
+                                <div class="notification-item ${notification.is_read ? '' : 'unread'}">
+                                    <div class="notification-title">${notification.title}</div>
+                                    <div class="notification-message">${notification.message}</div>
+                                    <div class="notification-time">${new Date(notification.created_at).toLocaleString()}</div>
+                                </div>
+                            `).join('');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.log('Could not load notifications');
+                });
+        }
+
+        function toggleNotificationDropdown() {
+            const dropdown = document.getElementById('notificationDropdown');
+            
+            if (dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+            } else {
+                dropdown.classList.add('show');
+                loadNotifications(); // Refresh notifications when opened
+            }
+        }
+
+        function markAllAsRead() {
+            fetch('/api/notifications/mark-all-read', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        loadNotifications();
+                        loadNotificationCount();
+                    }
+                })
+                .catch(error => {
+                    console.log('Could not mark all as read');
+                });
+        }
+
+        function showAllNotifications() {
+            // This would open a full notifications page if needed
+            window.location.href = '/notifications';
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            // Close profile dropdown
+            const profileDropdown = document.getElementById('profileDropdown');
+            const profileBtn = document.querySelector('.profile-btn');
+            
+            if (profileDropdown && !profileBtn.contains(event.target) && !profileDropdown.contains(event.target)) {
+                profileDropdown.classList.remove('show');
+                const arrow = document.querySelector('.dropdown-arrow');
+                if (arrow) arrow.style.transform = 'rotate(0deg)';
+            }
+            
+            // Close notification dropdown
+            const notificationDropdown = document.getElementById('notificationDropdown');
+            const notificationBtn = document.querySelector('.notification-btn');
+            
+            if (notificationDropdown && !notificationBtn.contains(event.target) && !notificationDropdown.contains(event.target)) {
+                notificationDropdown.classList.remove('show');
+            }
+        });
+    </script>
+    
+    <!-- Analytics and Performance Monitoring (placeholder) -->
+    <script>
+        // Placeholder for analytics
+        console.log('RazilHub - Mobile Data Platform Loaded');
+        
+        // Performance monitoring
+        window.addEventListener('load', function() {
+            const loadTime = performance.now();
+            console.log('Page loaded in:', Math.round(loadTime), 'ms');
+        });
+    </script>
+</body>
+</html>
+

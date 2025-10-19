@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Error | RazilHub</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            text-align: center;
+            color: white;
+            max-width: 600px;
+            padding: 40px;
+        }
+
+        .error-code {
+            font-size: 8em;
+            font-weight: bold;
+            margin: 0;
+            text-shadow: 0 0 20px rgba(255,255,255,0.3);
+        }
+
+        .error-message {
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+
+        .error-description {
+            font-size: 1.1em;
+            margin: 20px 0 40px 0;
+            opacity: 0.9;
+        }
+
+        .btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 15px 30px;
+            border: 2px solid white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background: white;
+            color: #dc3545;
+        }
+
+        @media (max-width: 768px) {
+            .error-code {
+                font-size: 6em;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="error-code">500</h1>
+        <h2 class="error-message">Internal Server Error</h2>
+        <p class="error-description">
+            Something went wrong on our end. We're working to fix this issue.
+        </p>
+        <a href="{{ url_for('dashboard') }}" class="btn">Go to Dashboard</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction History | RazilHub</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .transactions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .transactions-table th,
+        .transactions-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .transactions-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .transactions-table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .status.completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status.pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .amount {
+            font-weight: 600;
+        }
+
+        .amount.positive {
+            color: #28a745;
+        }
+
+        .amount.negative {
+            color: #dc3545;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            gap: 10px;
+        }
+
+        .pagination a,
+        .pagination span {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .pagination a:hover {
+            background-color: #f8f9fa;
+        }
+
+        .pagination .current {
+            background-color: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+
+            .transactions-table {
+                font-size: 0.9em;
+            }
+
+            .transactions-table th,
+            .transactions-table td {
+                padding: 10px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Transaction History</h1>
+        </div>
+
+        <div class="content">
+            {% if transactions %}
+                <table class="transactions-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Reference</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in transactions %}
+                        <tr>
+                            <td>{{ transaction.created_at }}</td>
+                            <td>
+                                {% if transaction.type == 'deposit' %}
+                                    💰 Deposit
+                                {% elif transaction.type == 'withdrawal' %}
+                                    💸 Withdrawal
+                                {% elif transaction.type == 'data_purchase' %}
+                                    📱 Data Purchase
+                                {% elif transaction.type == 'service_payment' %}
+                                    🛍️ Service Payment
+                                {% else %}
+                                    {{ transaction.type }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if transaction.description %}
+                                    {{ transaction.description }}
+                                {% elif transaction.network and transaction.data_package %}
+                                    {{ transaction.data_package }} {{ transaction.network }} for {{ transaction.recipient }}
+                                {% else %}
+                                    {{ transaction.type.title() }}
+                                {% endif %}
+                            </td>
+                            <td class="amount {% if transaction.type == 'deposit' %}positive{% else %}negative{% endif %}">
+                                {% if transaction.type == 'deposit' %}+{% else %}-{% endif %}GHS {{ transaction.amount }}
+                            </td>
+                            <td>
+                                <span class="status {{ transaction.status }}">{{ transaction.status.title() }}</span>
+                            </td>
+                            <td>
+                                {% if transaction.reference %}
+                                    <small>{{ transaction.reference }}</small>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                {% if total_pages > 1 %}
+                <div class="pagination">
+                    {% if current_page > 1 %}
+                        <a href="{{ url_for('transactions', page=current_page-1) }}">« Previous</a>
+                    {% endif %}
+
+                    {% for page_num in range(1, total_pages + 1) %}
+                        {% if page_num == current_page %}
+                            <span class="current">{{ page_num }}</span>
+                        {% else %}
+                            <a href="{{ url_for('transactions', page=page_num) }}">{{ page_num }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if current_page < total_pages %}
+                        <a href="{{ url_for('transactions', page=current_page+1) }}">Next »</a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% else %}
+                <div class="empty-state">
+                    <h3>No transactions found</h3>
+                    <p>Your transaction history will appear here once you start using RazilHub services.</p>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+</body>
+</html>

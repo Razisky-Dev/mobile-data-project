@@ -3,18 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RazilHub – Fast Data Packages</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>RazilHub - Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: url("{{ url_for('static', filename='bg.jpg') }}") no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        form {
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #5a6fd8;
+        }
+        .messages {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+        .messages li {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+        .success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+    </style>
 </head>
 <body>
-
-<div class="container">
-    <header>
-        <h1>🚀RazilHub</h1>
+    <div class="container">
+        <h1>🚀 RazilHub</h1>
         <p>Your one-stop hub for online services</p>
-    </header>
-
-    <main>
+        
         <h2>Sign In with Mobile Number</h2>
         <form method="POST">
             <label for="phone">Enter Mobile Number</label>
@@ -26,35 +101,15 @@
             {% if messages %}
                 <ul class="messages">
                     {% for msg in messages %}
-                        <li>{{ msg }}</li>
+                        <li class="error">{{ msg }}</li>
                     {% endfor %}
                 </ul>
             {% endif %}
         {% endwith %}
-    </main>
-
-    <footer>
-        <p>© 2025 RazilData. All rights reserved.</p>
-    </footer>
-</div>
-
-<script>
-function validatePhone() {
-    const phone = document.getElementById("phone").value.trim();
-    const error = document.getElementById("error");
-
-    // Ghana phone number pattern
-    const ghanaPattern = /^(?:\+233|0)(24|25|54|55|59|20|50|26|27|57|23|28|29|56|60|61|62|63|64|65|66|67|68|69)\d{6}$/;
-
-    if (!ghanaPattern.test(phone)) {
-        error.textContent = "Please enter a valid Ghana mobile number (MTN, Telecel, or AirtelTigo)";
-        return false;
-    }
-
-    error.textContent = "";
-    return true;
-}
-</script>
-
+        
+        <footer style="margin-top: 30px; color: #666; font-size: 14px;">
+            <p>© 2025 RazilData. All rights reserved.</p>
+        </footer>
+    </div>
 </body>
 </html>

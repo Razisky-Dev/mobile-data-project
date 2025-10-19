@@ -1,9 +1,189 @@
 <!DOCTYPE html>
-<html>
-<head><title>Food</title></head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Service | RazilHub</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .service-card {
+            border: 1px solid #e1e5e9;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: #f8f9fa;
+        }
+
+        .service-card h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .service-card p {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .service-card .price {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .form-group textarea {
+            height: 80px;
+            resize: vertical;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+
+        .messages {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 20px;
+        }
+
+        .messages li {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .messages .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .messages .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .messages .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
 <body>
-<h1>Food Service</h1>
-<p>This is the food ordering page. Coming soon!</p>
-<a href="{{ url_for('dashboard') }}">← Back to Dashboard</a>
+    <div class="container">
+        <div class="header">
+            <h1>🍔 Food Service</h1>
+        </div>
+
+        <div class="content">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul class="messages">
+                        {% for msg in messages %}
+                            <li class="{% if 'successfully' in msg.lower() %}success{% elif 'error' in msg.lower() or '❌' in msg %}error{% else %}info{% endif %}">{{ msg }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+
+            {% for service in services %}
+            <div class="service-card">
+                <h3>{{ service.name }}</h3>
+                <p>{{ service.description }}</p>
+                <div class="price">GHS {{ service.price }}</div>
+                
+                <form method="POST" action="{{ url_for('book_service') }}">
+                    <input type="hidden" name="service_id" value="{{ service.id }}">
+                    
+                    <div class="form-group">
+                        <label for="delivery_address">Delivery Address</label>
+                        <input type="text" id="delivery_address" name="delivery_address" 
+                               placeholder="Enter delivery address" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="special_instructions">Special Instructions (Optional)</label>
+                        <textarea id="special_instructions" name="special_instructions" 
+                                  placeholder="Any special dietary requirements or instructions"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn">Order Now</button>
+                </form>
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
 </body>
 </html>

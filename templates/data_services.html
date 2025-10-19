@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
             background-color: #e9eff5;
             margin: 0;
             padding: 0;
@@ -123,25 +123,6 @@
             box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
         }
 
-        .back-link {
-            text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #e1e8f0;
-        }
-
-        .back-link a {
-            color: #1c2541;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 16px;
-            transition: color 0.3s ease;
-        }
-
-        .back-link a:hover {
-            color: #007bff;
-            text-decoration: none;
-        }
 
         /* Specific network styling for better distinction */
         .network-section:nth-child(1) {
@@ -240,9 +221,6 @@
         </form>
     </div>
 
-    <div class="back-link">
-        <a href="{{ url_for('dashboard') }}">← Back to Dashboard</a>
-    </div>
 
 </div>
 

@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Manage Bookings | RazilHub</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .page-header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .page-header p {
+            color: #718096;
+            font-size: 1.1rem;
+            margin: 10px 0 0 0;
+        }
+
+        /* Statistics Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.4s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .stat-icon.primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .stat-icon.success { background: linear-gradient(135deg, #48bb78, #38a169); color: white; }
+        .stat-icon.warning { background: linear-gradient(135deg, #ed8936, #dd6b20); color: white; }
+        .stat-icon.info { background: linear-gradient(135deg, #4299e1, #3182ce); color: white; }
+
+        .stat-card h3 {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .number {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #2d3748;
+            margin: 0;
+            line-height: 1;
+        }
+
+        /* Search and Filter Section */
+        .controls-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .controls-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: nowrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 20px 10px 50px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            transition: all 0.3s ease;
+            background: #f7fafc;
+            height: 36px;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .filter-select {
+            padding: 10px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            background: #f7fafc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 150px;
+            width: 150px;
+            height: 36px;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .btn-controls {
+            padding: 10px 12px;
+            font-size: 0.75rem;
+            width: 100px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #718096, #4a5568);
+            color: white;
+            box-shadow: 0 4px 15px rgba(113, 128, 150, 0.2);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(113, 128, 150, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.2);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(72, 187, 120, 0.3);
+        }
+
+        /* Table Styles */
+        .table-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            overflow-x: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        table {
+            width: 100%;
+            min-width: 1300px;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #374151;
+            padding: 16px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 16px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+            font-size: 0.875rem;
+        }
+
+        tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-pending {
+            background: rgba(237, 137, 54, 0.1);
+            color: #dd6b20;
+            border: 1px solid rgba(237, 137, 54, 0.2);
+        }
+
+        .status-confirmed {
+            background: rgba(66, 153, 225, 0.1);
+            color: #3182ce;
+            border: 1px solid rgba(66, 153, 225, 0.2);
+        }
+
+        .status-completed {
+            background: rgba(72, 187, 120, 0.1);
+            color: #38a169;
+            border: 1px solid rgba(72, 187, 120, 0.2);
+        }
+
+        .status-cancelled {
+            background: rgba(245, 101, 101, 0.1);
+            color: #e53e3e;
+            border: 1px solid rgba(245, 101, 101, 0.2);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            min-width: 200px;
+        }
+
+        .amount {
+            font-weight: 700;
+            color: #38a169;
+            font-size: 0.75rem;
+        }
+
+        .amount.negative {
+            color: #e53e3e;
+        }
+
+        .filter-select option {
+            width: 100%;
+            padding: 5px;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            height: 32px;
+            width: auto;
+            min-width: 90px;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 30px;
+            padding: 20px;
+        }
+
+        .pagination a, .pagination span {
+            padding: 10px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .pagination a:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .pagination .current {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        /* Loading indicator */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 20px;
+                border-radius: 15px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 15px;
+            }
+
+            .controls-row {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .search-box input {
+                min-width: 200px;
+            }
+
+            .filter-select {
+                width: 120px;
+                min-width: 120px;
+            }
+
+            .btn {
+                padding: 12px 16px;
+                font-size: 0.8rem;
+            }
+
+            table {
+                font-size: 0.8rem;
+            }
+
+            table th,
+            table td {
+                padding: 16px 12px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .btn-sm {
+                width: 60px;
+                font-size: 0.7rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-box input {
+                min-width: 150px;
+            }
+
+            .btn {
+                width: 70px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h1>📅 Manage Bookings</h1>
+            <p>View and manage all service bookings</p>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon primary">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <h3>Total Bookings</h3>
+                <div class="number">{{ stats.total_bookings or 0 }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon warning">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3>Pending</h3>
+                <div class="number">{{ stats.pending_bookings or 0 }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon info">
+                    <i class="fas fa-truck"></i>
+                </div>
+                <h3>Confirmed</h3>
+                <div class="number">{{ stats.confirmed_bookings or 0 }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon success">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3>Completed</h3>
+                <div class="number">{{ stats.completed_bookings or 0 }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon info">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <h3>Avg Value</h3>
+                <div class="number">GHS {{ "%.2f"|format(stats.avg_booking_value or 0) }}</div>
+            </div>
+        </div>
+
+        <!-- Search and Filter Controls -->
+        <div class="controls-section">
+            <form method="GET" class="controls-row">
+                <div class="search-box">
+                    <input type="text" name="search" placeholder="Search by service, phone, or name..." 
+                           value="{{ search }}">
+                </div>
+                <select name="status" class="filter-select">
+                    <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Status</option>
+                    <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="confirmed" {% if status_filter == 'confirmed' %}selected{% endif %}>Confirmed</option>
+                    <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
+                    <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+                <button type="submit" class="btn btn-primary btn-controls">
+                    <i class="fas fa-filter"></i> Filter
+                </button>
+                <a href="{{ url_for('admin_bookings') }}" class="btn btn-secondary btn-controls">
+                    <i class="fas fa-refresh"></i> Reset
+                </a>
+            </form>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div class="loading" id="loadingIndicator">
+            <div class="spinner"></div>
+            <p>Loading bookings...</p>
+        </div>
+
+        <!-- Bookings Table -->
+        <div class="table-container" id="bookingsTable">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Service</th>
+                        <th>Customer</th>
+                        <th>Phone</th>
+                        <th>Address</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Booked</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td>#{{ booking.id }}</td>
+                        <td>{{ booking.service_name }}</td>
+                        <td>
+                            {% if booking.first_name and booking.last_name %}
+                                {{ booking.first_name }} {{ booking.last_name }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>{{ booking.phone }}</td>
+                        <td>{{ booking.delivery_address or '-' }}</td>
+                        <td>{{ booking.special_instructions or '-' }}</td>
+                        <td class="amount">GHS {{ booking.total_amount }}</td>
+                        <td>
+                            <span class="status-badge status-{{ booking.status }}">
+                                {{ booking.status.title() }}
+                            </span>
+                        </td>
+                        <td>{{ booking.created_at[:16] }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                {% if booking.status == 'pending' %}
+                                    <form method="POST" action="{{ url_for('confirm_booking', booking_id=booking.id) }}" style="display: inline;">
+                                        <button type="submit" class="btn btn-sm btn-success" title="Confirm and notify user">
+                                            <i class="fas fa-check"></i> Confirm
+                                        </button>
+                                    </form>
+                                {% endif %}
+                                <form method="POST" action="{{ url_for('update_booking_status', booking_id=booking.id) }}" style="display: inline;">
+                                    <select name="status" class="filter-select" style="width: 150px; height: 40px; font-size: 0.8rem;" onchange="this.form.submit()">
+                                        <option value="pending" {% if booking.status == 'pending' %}selected{% endif %}>Pending</option>
+                                        <option value="confirmed" {% if booking.status == 'confirmed' %}selected{% endif %}>Confirmed</option>
+                                        <option value="completed" {% if booking.status == 'completed' %}selected{% endif %}>Completed</option>
+                                        <option value="cancelled" {% if booking.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                                    </select>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% if not bookings %}
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 40px; color: #718096;">
+                            <i class="fas fa-calendar-times" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                            No bookings found
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if total_pages > 1 %}
+        <div class="pagination">
+            {% if current_page > 1 %}
+                <a href="{{ url_for('admin_bookings', page=current_page-1, search=search, status=status_filter) }}">← Previous</a>
+            {% endif %}
+            
+            {% for page_num in range(1, total_pages + 1) %}
+                {% if page_num == current_page %}
+                    <span class="current">{{ page_num }}</span>
+                {% else %}
+                    <a href="{{ url_for('admin_bookings', page=page_num, search=search, status=status_filter) }}">{{ page_num }}</a>
+                {% endif %}
+            {% endfor %}
+            
+            {% if current_page < total_pages %}
+                <a href="{{ url_for('admin_bookings', page=current_page+1, search=search, status=status_filter) }}">Next →</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // Show loading indicator on form submission
+        document.querySelector('form').addEventListener('submit', function() {
+            document.getElementById('loadingIndicator').classList.add('show');
+            document.getElementById('bookingsTable').style.opacity = '0.5';
+        });
+
+        // Hide loading indicator when page loads
+        window.addEventListener('load', function() {
+            document.getElementById('loadingIndicator').classList.remove('show');
+            document.getElementById('bookingsTable').style.opacity = '1';
+        });
+
+        // Add loading state to status change forms and prevent page jumping
+        document.querySelectorAll('form[method="POST"]').forEach(function(form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const select = this.querySelector('select');
+                const button = this.querySelector('button');
+                
+                if (select) {
+                    select.disabled = true;
+                    select.style.opacity = '0.6';
+                }
+                
+                if (button) {
+                    button.disabled = true;
+                    button.style.opacity = '0.6';
+                }
+                
+                // Submit the form normally but prevent page jump
+                const formData = new FormData(this);
+                const action = this.action;
+                
+                fetch(action, {
+                    method: 'POST',
+                    body: formData
+                }).then(function(response) {
+                    if (response.ok) {
+                        // Show success message and reload the page smoothly
+                        const flashMessage = document.createElement('div');
+                        flashMessage.style.cssText = `
+                            position: fixed;
+                            top: 20px;
+                            right: 20px;
+                            background: #48bb78;
+                            color: white;
+                            padding: 15px 20px;
+                            border-radius: 8px;
+                            z-index: 10000;
+                            font-weight: 600;
+                            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                        `;
+                        flashMessage.textContent = '✅ Action completed successfully!';
+                        document.body.appendChild(flashMessage);
+                        
+                        // Remove flash message after 3 seconds and reload
+                        setTimeout(function() {
+                            document.body.removeChild(flashMessage);
+                            window.location.reload();
+                        }, 1500);
+                    }
+                }).catch(function(error) {
+                    console.error('Error:', error);
+                    // Re-enable controls on error
+                    if (select) {
+                        select.disabled = false;
+                        select.style.opacity = '1';
+                    }
+                    if (button) {
+                        button.disabled = false;
+                        button.style.opacity = '1';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

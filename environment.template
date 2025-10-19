@@ -1,0 +1,351 @@
+# ===========================================
+# RAZILHUB - MOBILE DATA VENDING PLATFORM
+# Environment Configuration Template
+# ===========================================
+
+# ===========================================
+# FLASK APPLICATION CONFIGURATION
+# ===========================================
+FLASK_APP=wsgi.py
+FLASK_ENV=production
+FLASK_DEBUG=False
+
+# Secret key for Flask sessions and CSRF protection
+# Generate a strong secret key for production
+SECRET_KEY=your-super-secret-key-change-this-in-production-2025
+
+# Application URL (for generating absolute URLs)
+APP_URL=https://your-domain.com
+APP_NAME=RazilHub
+APP_VERSION=1.0.0
+
+# ===========================================
+# DATABASE CONFIGURATION
+# ===========================================
+# For SQLite (Development)
+DATABASE_URL=sqlite:///data_vending.db
+
+# For PostgreSQL (Production)
+# DATABASE_URL=postgresql://username:password@localhost:5432/razilhub_db
+# DB_HOST=localhost
+# DB_PORT=5432
+# DB_NAME=razilhub_db
+# DB_USER=razilhub_user
+# DB_PASSWORD=your-db-password
+
+# ===========================================
+# SECURITY CONFIGURATION
+# ===========================================
+# Session configuration
+SESSION_COOKIE_SECURE=True
+SESSION_COOKIE_HTTPONLY=True
+SESSION_COOKIE_SAMESITE=Lax
+PERMANENT_SESSION_LIFETIME=86400
+
+# CSRF protection
+WTF_CSRF_ENABLED=True
+WTF_CSRF_TIME_LIMIT=3600
+
+# Rate limiting
+RATELIMIT_STORAGE_URL=memory://
+RATELIMIT_DEFAULT=100 per hour
+
+# ===========================================
+# OTP AND AUTHENTICATION
+# ===========================================
+# OTP configuration
+OTP_EXPIRY_MINUTES=10
+OTP_LENGTH=6
+OTP_ATTEMPTS_LIMIT=3
+
+# SMS/OTP Service Configuration
+# For Twilio
+TWILIO_ACCOUNT_SID=your-twilio-account-sid
+TWILIO_AUTH_TOKEN=your-twilio-auth-token
+TWILIO_PHONE_NUMBER=+1234567890
+
+# For Africa's Talking
+AFRICASTALKING_USERNAME=your-username
+AFRICASTALKING_API_KEY=your-api-key
+AFRICASTALKING_SENDER_ID=RazilHub
+
+# For custom SMS gateway
+SMS_GATEWAY_URL=https://your-sms-gateway.com/api
+SMS_GATEWAY_API_KEY=your-sms-api-key
+SMS_GATEWAY_SENDER_ID=RazilHub
+
+# ===========================================
+# PAYMENT GATEWAY CONFIGURATION
+# ===========================================
+# Mobile Money (MTN, Vodafone, AirtelTigo)
+MTN_MOMO_API_URL=https://api.mtn.com/v1/collection
+MTN_MOMO_API_KEY=your-mtn-momo-api-key
+MTN_MOMO_SUBSCRIPTION_KEY=your-mtn-subscription-key
+
+VODAFONE_CASH_API_URL=https://api.vodafone.com.gh/v1/cash
+VODAFONE_CASH_API_KEY=your-vodafone-api-key
+
+AIRTELTIGO_MONEY_API_URL=https://api.airteltigo.com.gh/v1/money
+AIRTELTIGO_MONEY_API_KEY=your-airteltigo-api-key
+
+# Card payments
+STRIPE_PUBLISHABLE_KEY=pk_test_your-stripe-publishable-key
+STRIPE_SECRET_KEY=sk_test_your-stripe-secret-key
+STRIPE_WEBHOOK_SECRET=whsec_your-webhook-secret
+
+PAYPAL_CLIENT_ID=your-paypal-client-id
+PAYPAL_CLIENT_SECRET=your-paypal-client-secret
+PAYPAL_MODE=sandbox
+
+# ===========================================
+# NETWORK API INTEGRATIONS
+# ===========================================
+# MTN Data API
+MTN_API_URL=https://api.mtn.com.gh/v1/data
+MTN_API_KEY=your-mtn-data-api-key
+MTN_API_SECRET=your-mtn-api-secret
+
+# Telecel Data API
+TELECEL_API_URL=https://api.telecel.com.gh/v1/data
+TELECEL_API_KEY=your-telecel-api-key
+TELECEL_API_SECRET=your-telecel-api-secret
+
+# AirtelTigo Data API
+AIRTELTIGO_API_URL=https://api.airteltigo.com.gh/v1/data
+AIRTELTIGO_API_KEY=your-airteltigo-api-key
+AIRTELTIGO_API_SECRET=your-airteltigo-api-secret
+
+# ===========================================
+# EMAIL CONFIGURATION
+# ===========================================
+MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USE_TLS=True
+MAIL_USE_SSL=False
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-app-password
+MAIL_DEFAULT_SENDER=RazilHub <noreply@razilhub.com>
+
+# Email templates
+EMAIL_FROM_NAME=RazilHub
+EMAIL_FROM_ADDRESS=noreply@razilhub.com
+EMAIL_SUPPORT_ADDRESS=support@razilhub.com
+
+# ===========================================
+# CLOUD STORAGE CONFIGURATION
+# ===========================================
+# AWS S3
+AWS_ACCESS_KEY_ID=your-aws-access-key
+AWS_SECRET_ACCESS_KEY=your-aws-secret-key
+AWS_REGION=us-east-1
+AWS_S3_BUCKET=razilhub-uploads
+
+# Google Cloud Storage
+GOOGLE_CLOUD_PROJECT_ID=your-project-id
+GOOGLE_CLOUD_STORAGE_BUCKET=razilhub-storage
+GOOGLE_APPLICATION_CREDENTIALS=path/to/service-account.json
+
+# ===========================================
+# CACHING CONFIGURATION
+# ===========================================
+# Redis
+REDIS_URL=redis://localhost:6379/0
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=your-redis-password
+
+# Memcached
+MEMCACHED_SERVERS=localhost:11211
+
+# ===========================================
+# LOGGING CONFIGURATION
+# ===========================================
+LOG_LEVEL=INFO
+LOG_FILE=logs/razilhub.log
+LOG_MAX_SIZE=10485760
+LOG_BACKUP_COUNT=5
+
+# Sentry for error tracking
+SENTRY_DSN=https://your-sentry-dsn@sentry.io/project-id
+
+# ===========================================
+# MONITORING AND ANALYTICS
+# ===========================================
+# Google Analytics
+GOOGLE_ANALYTICS_ID=GA-XXXXXXXXX-X
+
+# Mixpanel
+MIXPANEL_TOKEN=your-mixpanel-token
+
+# ===========================================
+# WALLET CONFIGURATION
+# ===========================================
+DEFAULT_WALLET_BALANCE=50.0
+MIN_WALLET_BALANCE=0.0
+MAX_WALLET_BALANCE=10000.0
+WALLET_TRANSACTION_FEE=0.0
+
+# ===========================================
+# SERVICE CONFIGURATION
+# ===========================================
+# Service fees and commissions
+DATA_SERVICE_COMMISSION=0.05
+CAR_WASH_COMMISSION=0.10
+DELIVERY_COMMISSION=0.15
+FOOD_SERVICE_COMMISSION=0.20
+
+# Service availability
+ENABLE_DATA_SERVICE=True
+ENABLE_CAR_WASH=True
+ENABLE_DELIVERY=True
+ENABLE_FOOD_SERVICE=True
+
+# ===========================================
+# API CONFIGURATION
+# ===========================================
+API_RATE_LIMIT=100 per hour
+API_KEY_LENGTH=32
+API_VERSION=v1
+
+# External API timeouts
+API_TIMEOUT=30
+SMS_API_TIMEOUT=10
+PAYMENT_API_TIMEOUT=60
+
+# ===========================================
+# FILE UPLOAD CONFIGURATION
+# ===========================================
+MAX_CONTENT_LENGTH=16777216
+UPLOAD_FOLDER=uploads
+ALLOWED_EXTENSIONS=txt,pdf,png,jpg,jpeg,gif
+
+# ===========================================
+# NOTIFICATION CONFIGURATION
+# ===========================================
+# Push notifications
+FCM_SERVER_KEY=your-fcm-server-key
+APNS_CERTIFICATE_PATH=path/to/apns-cert.pem
+APNS_KEY_PATH=path/to/apns-key.pem
+
+# Webhook URLs
+WEBHOOK_SUCCESS_URL=https://your-domain.com/webhook/success
+WEBHOOK_FAILURE_URL=https://your-domain.com/webhook/failure
+
+# ===========================================
+# DEVELOPMENT CONFIGURATION
+# ===========================================
+# Debug settings (only for development)
+DEBUG=False
+TESTING=False
+WTF_CSRF_ENABLED=True
+
+# Development database
+DEV_DATABASE_URL=sqlite:///dev_data_vending.db
+
+# ===========================================
+# PRODUCTION DEPLOYMENT
+# ===========================================
+# Server configuration
+HOST=0.0.0.0
+PORT=5001
+WORKERS=4
+TIMEOUT=120
+
+# SSL configuration
+SSL_CERT_PATH=ssl/cert.pem
+SSL_KEY_PATH=ssl/key.pem
+
+# Load balancer
+LOAD_BALANCER_IP=your-load-balancer-ip
+
+# ===========================================
+# BACKUP CONFIGURATION
+# ===========================================
+BACKUP_SCHEDULE=0 2 * * *
+BACKUP_RETENTION_DAYS=30
+BACKUP_S3_BUCKET=razilhub-backups
+
+# ===========================================
+# COMPLIANCE AND LEGAL
+# ===========================================
+# Terms and conditions
+TERMS_VERSION=1.0
+PRIVACY_POLICY_VERSION=1.0
+
+# Compliance settings
+ENABLE_AUDIT_LOG=True
+ENABLE_DATA_ENCRYPTION=True
+ENABLE_PCI_COMPLIANCE=False
+
+# ===========================================
+# FEATURE FLAGS
+# ===========================================
+ENABLE_ADMIN_PANEL=True
+ENABLE_API_ACCESS=True
+ENABLE_USER_REGISTRATION=True
+ENABLE_WALLET_TRANSFERS=True
+ENABLE_SERVICE_BOOKING=True
+ENABLE_TRANSACTION_HISTORY=True
+ENABLE_EMAIL_NOTIFICATIONS=True
+ENABLE_SMS_NOTIFICATIONS=True
+ENABLE_PUSH_NOTIFICATIONS=False
+
+# ===========================================
+# BUSINESS CONFIGURATION
+# ===========================================
+# Company information
+COMPANY_NAME=RazilHub
+COMPANY_EMAIL=info@razilhub.com
+COMPANY_PHONE=+233XXXXXXXXX
+COMPANY_ADDRESS=Accra, Ghana
+COMPANY_WEBSITE=https://razilhub.com
+
+# Business hours
+BUSINESS_START_TIME=08:00
+BUSINESS_END_TIME=18:00
+BUSINESS_TIMEZONE=Africa/Accra
+
+# Currency settings
+DEFAULT_CURRENCY=GHS
+CURRENCY_SYMBOL=₵
+DECIMAL_PLACES=2
+
+# ===========================================
+# SOCIAL MEDIA INTEGRATION
+# ===========================================
+FACEBOOK_APP_ID=your-facebook-app-id
+FACEBOOK_APP_SECRET=your-facebook-app-secret
+TWITTER_API_KEY=your-twitter-api-key
+TWITTER_API_SECRET=your-twitter-api-secret
+INSTAGRAM_CLIENT_ID=your-instagram-client-id
+INSTAGRAM_CLIENT_SECRET=your-instagram-client-secret
+
+# ===========================================
+# THIRD-PARTY SERVICES
+# ===========================================
+# Google Maps
+GOOGLE_MAPS_API_KEY=your-google-maps-api-key
+
+# Firebase
+FIREBASE_PROJECT_ID=your-firebase-project-id
+FIREBASE_PRIVATE_KEY=your-firebase-private-key
+FIREBASE_CLIENT_EMAIL=your-firebase-client-email
+
+# ===========================================
+# CUSTOM CONFIGURATIONS
+# ===========================================
+# Add any custom environment variables here
+CUSTOM_SETTING_1=value1
+CUSTOM_SETTING_2=value2
+
+# ===========================================
+# NOTES
+# ===========================================
+# 1. Copy this file to .env and update with your actual values
+# 2. Never commit .env file to version control
+# 3. Use strong, unique passwords and API keys
+# 4. Enable SSL/TLS in production
+# 5. Regular backup of database and files
+# 6. Monitor logs and performance
+# 7. Keep dependencies updated
+# ===========================================
