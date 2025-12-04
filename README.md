@@ -8,7 +8,7 @@ A complete, production-ready Flask application for vending mobile data packages 
 - **Secure Authentication**: OTP-based login system
 - **Wallet System**: Balance management with transaction history
 - **Admin Dashboard**: Complete administrative interface
-- **Service Booking**: Car wash, delivery, and food ordering
+- **Service Booking**: Car detailing, delivery, and food ordering
 - **Production Ready**: Docker, Nginx, SSL support
 - **API Endpoints**: REST API for mobile integration
 

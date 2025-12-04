@@ -4,7 +4,9 @@ A complete Flask application for vending mobile data packages
 """
 
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, g
+from flask import make_response
 import random
+import time
 import re
 import sqlite3
 import os
@@ -192,8 +194,8 @@ def init_db():
     
     # Insert default services
     default_services = [
-        ('Car Wash - Basic', 'car_wash', 25.0, 'Exterior wash and dry'),
-        ('Car Wash - Premium', 'car_wash', 45.0, 'Interior and exterior wash with wax'),
+        ('Car Detailing - Basic', 'car_detailing', 25.0, 'Exterior wash and dry'),
+        ('Car Detailing - Premium', 'car_detailing', 45.0, 'Interior and exterior wash with wax'),
         ('Food Delivery', 'food', 15.0, 'Food delivery service fee'),
         ('Parcel Delivery', 'delivery', 30.0, 'Parcel delivery within city'),
     ]
@@ -488,7 +490,7 @@ def data():
 @login_required
 def buy_data_page():
     balance = get_user_wallet(session["user_id"])
-    return render_template("buy_data.html", balance=balance)
+    return render_template("data_services.html", balance=balance)
 
 @app.route("/buy_data", methods=["POST"])
 @login_required
@@ -497,12 +499,16 @@ def buy_data():
     price = float(request.form.get("price", 0))
     recipient = request.form.get("recipient", "")
 
-    # Validate recipient number format
-    ghana_pattern = re.compile(r"^0(20|23|24|25|26|27|28|29|50|53|54|55|56|57|58|59)\d{7}$")
+    payment_method = request.form.get("payment_method")
 
+    # Validate recipient number format
+    ghana_pattern = re.compile(r"^0(20|24|25|26|27|50|53|54|55|56|57|59)\d{7}$")
     if not recipient or not ghana_pattern.match(recipient):
         flash("❌ Please enter a valid Ghana mobile number", "error")
         return redirect(url_for("buy_data_page"))
+
+    if payment_method == "momo":
+        return redirect(url_for("momo_payment"))
 
     if price <= 0:
         flash("❌ Invalid package selected.", "error")
@@ -511,24 +517,24 @@ def buy_data():
     user_id = session["user_id"]
     current_balance = get_user_wallet(user_id)
 
-    if current_balance < price:
-        flash("❌ Insufficient balance. Please deposit to continue.", "error")
-        return redirect(url_for("buy_data_page"))
+    if payment_method == "wallet":
+        if current_balance < price:
+            flash("❌ Insufficient balance. Please deposit to continue.", "error")
+            return redirect(url_for("buy_data_page"))
 
     # Map prices to data amounts for confirmation message
     data_plans = {
-        10: "1GB", 18: "2GB", 40: "5GB",  # MTN
-        9: "1GB", 25: "3GB", 40: "5GB",   # Telecel
-        8: "1GB", 22: "3GB", 35: "5GB"    # AirtelTigo
+        5: "1GB", 10: "2GB", 15: "3GB", 20: "4GB", 24: "5GB", 29: "6GB"  # MTN
+        9: "1GB", 25: "3GB", 40: "5GB",  # Telecel
+        8: "1GB", 22: "3GB", 35: "5GB"  # AirtelTigo
     }
 
     plan = data_plans.get(price, f"GHS {price}")
     description = f"Data purchase: {plan} {network} for {recipient}"
-    
+
     # Update wallet and create transaction
     reference = update_wallet(user_id, price, 'data_purchase', network, recipient, plan, description)
-    
-    # Create notification for data purchase
+# Create notification for data purchase
     with get_db() as conn:
         conn.execute('''
             INSERT INTO notifications (user_id, type, title, message, created_at)
@@ -601,13 +607,13 @@ def withdraw():
 # ----------------------------
 # SERVICE BOOKINGS
 # ----------------------------
-@app.route("/car_wash")
+@app.route("/car_detailing")
 @login_required
-def car_wash():
+def car_detailing():
     conn = get_db_connection()
     services = conn.execute('SELECT * FROM services WHERE category = ? AND is_active = TRUE', ('car_wash',)).fetchall()
     conn.close()
-    return render_template("car_wash.html", services=services)
+    return render_template("car_detailing.html", services=services)
 
 @app.route("/delivery")
 @login_required
