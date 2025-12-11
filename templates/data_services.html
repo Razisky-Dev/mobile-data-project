@@ -160,6 +160,45 @@
 <body>
 
 <div class="container">
+    {% set ns = namespace(success_text=None) %}
+    {% set flashes = get_flashed_messages(with_categories=true) %}
+    {% for message in flashes %}
+        {% if message[0] == 'success' and ns.success_text is none %}
+            {% set ns.success_text = message[1] %}
+        {% elif message[0] != 'success' %}
+            <div class="flash {{ message[0] }}" style="margin-bottom: 15px; padding: 12px; border-radius: 8px; border: 1px solid #e1e8f0; background: #fff3cd; color: #856404;">
+                {{ message[1] }}
+            </div>
+        {% endif %}
+    {% endfor %}
+
+    {% if ns.success_text %}
+    <div id="successModal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 2000;">
+        <div style="background: white; border-radius: 12px; max-width: 520px; width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden;">
+            <div style="background: #e8f5e8; color: #2e7d32; padding: 16px 20px; border-bottom: 1px solid #c8e6c9; font-weight: 600;">
+                Purchase Successful
+            </div>
+            <div style="padding: 18px 20px; color: #333; line-height: 1.5;">
+                {{ ns.success_text }}
+            </div>
+            <div style="padding: 16px 20px; text-align: right; background: #f8f9fa; border-top: 1px solid #eee;">
+                <button id="successOkBtn" style="background: #2e7d32; color: white; border: none; border-radius: 8px; padding: 10px 18px; cursor: pointer; font-weight: 600;">OK</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        (function(){
+            var modal = document.getElementById('successModal');
+            var okBtn = document.getElementById('successOkBtn');
+            function closeModal(){ if(modal) modal.style.display = 'none'; }
+            if(okBtn) okBtn.addEventListener('click', closeModal);
+            // Close on ESC
+            document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeModal(); });
+            // Close when clicking outside the dialog
+            if(modal) modal.addEventListener('click', function(e){ if(e.target === modal) closeModal(); });
+        })();
+    </script>
+    {% endif %}
 
     <!-- MTN Section -->
     <div class="network-section">
@@ -167,7 +206,6 @@
         <h2>MTN Data Bundles</h2>
         <form class="network-form" action="{{ url_for('buy_data') }}" method="POST">
             <input type="hidden" name="network" value="MTN">
-            <input type="hidden" name="price" value="5">
             <label for="mtn_number">Recipient Number</label>
             <input type="text" id="mtn_number" name="recipient" placeholder="e.g. 0541234567" required>
 
@@ -200,7 +238,7 @@
     <div class="network-section">
         <img src="{{ url_for('static', filename='telecel.png') }}" alt="Telecel Logo" class="network-logo">
         <h2>Telecel Data Bundles</h2>
-        <form class="network-form"action="{{ url_for('buy_data') }}" method="POST">
+        <form class="network-form" action="{{ url_for('buy_data') }}" method="POST">
             <input type="hidden" name="network" value="telecel">
             <label for="telecel_number">Recipient Number</label>
             <input type="text" id="telecel_number" name="recipient" placeholder="e.g. 0501234567" required>
@@ -226,12 +264,12 @@
 
     <!-- AirtelTigo Section -->
     <div class="network-section">
-        <img src="{{ url_for('static', filename='airteltigo.png') }}" alt="AirtelTigo Logo" class="network-logo">
+        <img src="{{ url_for('static', filename='AirtelTigo.png') }}" alt="AirtelTigo Logo" class="network-logo">
         <h2>AirtelTigo Data Bundles</h2>
-        <form class="network-form"action="{{ url_for('buy_data') }}" method="POST">
+        <form class="network-form" action="{{ url_for('buy_data') }}" method="POST">
             <input type="hidden" name="network" value="airteltigo">
             <label for="airteltigo_number">Recipient Number</label>
-            <input type="text" id="mtn_number" name="recipient" placeholder="e.g. 0571234567" required>
+            <input type="text" id="airteltigo_number" name="recipient" placeholder="e.g. 0571234567" required>
 
             <label for="airteltigo_package">Select Package</label>
             <select id="airteltigo_package" name="price" required>
