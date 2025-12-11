@@ -165,7 +165,9 @@
     <div class="network-section">
         <img src="{{ url_for('static', filename='mtn.png') }}" alt="MTN Logo" class="network-logo" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiByeD0iOCIgZmlsbD0iI0ZGRkNDMCIvPgo8dGV4dCB4PSI0MCIgeT0iNDUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzMzMyIgdGV4dC1hbmNob3I9Im1pZGRsZSI+TVROPC90ZXh0Pgo8L3N2Zz4K'">
         <h2>MTN Data Bundles</h2>
-        <form class="network-form" action="{{ url_for('buy_data', network='MTN', price=0) }}" method="POST">
+        <form class="network-form" action="{{ url_for('buy_data') }}" method="POST">
+            <input type="hidden" name="network" value="MTN">
+            <input type="hidden" name="price" value="5">
             <label for="mtn_number">Recipient Number</label>
             <input type="text" id="mtn_number" name="recipient" placeholder="e.g. 0541234567" required>
 
@@ -198,9 +200,10 @@
     <div class="network-section">
         <img src="{{ url_for('static', filename='telecel.png') }}" alt="Telecel Logo" class="network-logo">
         <h2>Telecel Data Bundles</h2>
-        <form class="network-form" action="{{ url_for('buy_data', network='Telecel', price=0) }}" method="POST">
+        <form class="network-form"action="{{ url_for('buy_data') }}" method="POST">
+            <input type="hidden" name="network" value="telecel">
             <label for="telecel_number">Recipient Number</label>
-            <input type="text" id="telecel_number" name="recipient" placeholder="e.g. 0201234567" required>
+            <input type="text" id="telecel_number" name="recipient" placeholder="e.g. 0501234567" required>
 
             <label for="telecel_package">Select Package</label>
             <select id="telecel_package" name="price" required>
@@ -225,12 +228,13 @@
     <div class="network-section">
         <img src="{{ url_for('static', filename='airteltigo.png') }}" alt="AirtelTigo Logo" class="network-logo">
         <h2>AirtelTigo Data Bundles</h2>
-        <form class="network-form" action="{{ url_for('buy_data', network='AirtelTigo', price=0) }}" method="POST">
-            <label for="tigo_number">Recipient Number</label>
-            <input type="text" id="tigo_number" name="recipient" placeholder="e.g. 0571234567" required>
+        <form class="network-form"action="{{ url_for('buy_data') }}" method="POST">
+            <input type="hidden" name="network" value="airteltigo">
+            <label for="airteltigo_number">Recipient Number</label>
+            <input type="text" id="mtn_number" name="recipient" placeholder="e.g. 0571234567" required>
 
-            <label for="tigo_package">Select Package</label>
-            <select id="tigo_package" name="price" required>
+            <label for="airteltigo_package">Select Package</label>
+            <select id="airteltigo_package" name="price" required>
                 <option value="">-- Choose a package --</option>
                 <option value="4.5">1GB – GHS4.5 </option>
                 <option value="9.5">2GB – GHS 9.50</option>
