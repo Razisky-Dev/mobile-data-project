@@ -491,12 +491,20 @@ def data():
     balance = get_user_wallet(session["user_id"])
     return render_template("data_services.html", balance=balance)
 
-@app.route("/buy_data", methods=["POST"])
+@app.route("/buy_data", methods=["GET", "POST"])
 @login_required
 def buy_data():
+    # If accessed via GET (e.g., redirect or bookmark), send user to the data page
+    if request.method == "GET":
+        return redirect(url_for("data"))
     user_id = session["user_id"]
     network = request.form.get("network")
-    price = float(request.form.get("price", 0))
+    # Prefer the last value if multiple 'price' fields are present (e.g., hidden + select)
+    price_values = request.form.getlist("price")
+    try:
+        price = float(price_values[-1]) if price_values else 0
+    except ValueError:
+        price = 0
     recipient = request.form.get("recipient", "")
     payment_method = request.form.get("payment_method")
 
@@ -504,11 +512,11 @@ def buy_data():
     ghana_pattern = re.compile(r"^0(20|24|25|26|27|50|53|54|55|56|57|59)\d{7}$")
     if not recipient or not ghana_pattern.match(recipient):
         flash("❌ Please enter a valid Ghana mobile number", "error")
-        return redirect(url_for("buy_data"))
+        return redirect(url_for("data"))
 
     if price <= 0:
         flash("❌ Invalid package selected.", "error")
-        return redirect(url_for("buy_data"))
+        return redirect(url_for("data"))
 
     # Map prices to data amounts
     data_plans = {
@@ -529,7 +537,7 @@ def buy_data():
 
         if current_balance < price:
             flash("❌ Insufficient balance. Please deposit to continue.", "error")
-            return redirect(url_for("buy_data"))
+            return redirect(url_for("data"))
 
         # Deduct and create transaction
         reference = update_wallet(user_id, price, "data_purchase", network, recipient, plan, description)
@@ -545,14 +553,14 @@ def buy_data():
             conn.commit()
 
         flash(f"✅ Successfully purchased {plan} {network} data for {recipient}! Reference: {reference}", "success")
-        return redirect(url_for("buy_data"))
+        return redirect(url_for("data"))
 
     # MOMO redirect
     if payment_method == "momo":
         return redirect(url_for("momo_payment", network=network, price=price, recipient=recipient))
 
     flash("❌ Invalid payment method.", "error")
-    return redirect(url_for("buy_data"))
+    return redirect(url_for("data"))
 
 # ----------------------------
 # WALLET MANAGEMENT
@@ -612,7 +620,8 @@ def car_detailing():
     conn = get_db_connection()
     services = conn.execute('SELECT * FROM services WHERE category = ? AND is_active = TRUE', ('car_wash',)).fetchall()
     conn.close()
-    return render_template("car_detailing.html", services=services)
+    # Use existing template for car wash/detailing services
+    return render_template("car_wash.html", services=services)
 
 @app.route("/delivery")
 @login_required
@@ -1289,6 +1298,15 @@ def health_check():
             'timestamp': datetime.utcnow().isoformat(),
             'error': str(e)
         }), 500
+
+# ----------------------------
+# DEV TOOLING COMPATIBILITY
+# ----------------------------
+# Some dev environments attempt to load Vite's HMR client.
+# We don't use Vite, but returning 204 avoids noisy 404 logs.
+@app.route("/@vite/client", methods=["GET", "HEAD"])
+def vite_client_placeholder():
+    return "", 204
 
 # ----------------------------
 # ERROR HANDLERS
